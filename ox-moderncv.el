@@ -62,9 +62,12 @@
     (:photo "PHOTO" nil nil parse)
     (:gitlab "GITLAB" nil nil parse)
     (:github "GITHUB" nil nil parse)
-    (:linkedin "LINKEDIN" nil nil parse)
-    (:with-email nil "email" t t)
-    )
+    (:linkedin "LINKEDIN" nil nil parse))
+  ; append to LaTeX menu entry
+  :menu-entry
+  '(?l 1
+       ((?c "As CV PDF file" org-moderncv-export-to-pdf)
+        (?C "As CV LaTeX file" org-moderncv-export-to-latex)))
   :translate-alist '((template . org-moderncv-template)
                      (headline . org-moderncv-headline)))
 
@@ -78,8 +81,7 @@
   "Return complete document string after LaTeX conversion.
 CONTENTS is the transcoded contents string.  INFO is a plist
 holding export options."
-  (let ((title (org-export-data (plist-get info :title) info))
-        (spec (org-latex--format-spec info)))
+  (let ((title (org-export-data (plist-get info :title) info)))
     (concat
      ;; Time-stamp.
      (and (plist-get info :time-stamp-file)
@@ -108,8 +110,7 @@ holding export options."
        (when (org-string-nw-p photo)
          (format "\\photo{%s}\n" photo)))
      ;; email
-     (let ((email (and (plist-get info :with-email)
-                       (org-export-data (plist-get info :email) info))))
+     (let ((email (org-export-data (plist-get info :email) info)))
        (when (org-string-nw-p email)
          (format "\\email{%s}\n" email)))
      ;; phone
@@ -153,23 +154,11 @@ holding export options."
                 (if separate "" (or formatted-subtitle "")))
         (when (and separate subtitle)
           (concat formatted-subtitle "\n"))))
-     ;; Hyperref options.
-     (let ((template (plist-get info :latex-hyperref-template)))
-       (and (stringp template)
-            (format-spec template spec)))
      ;; Document start.
      "\\begin{document}\n\n"
      ;; Title command.
-     (let* ((title-command (plist-get info :latex-title-command))
-            (command (and (stringp title-command)
-                          (format-spec title-command spec))))
-       (org-element-normalize-string
-        (cond ((not (plist-get info :with-title)) nil)
-              ((string= "" title) nil)
-              ((not (stringp command)) nil)
-              ((string-match "\\(?:[^%]\\|^\\)%s" command)
-               (format command title))
-              (t command))))
+     "\\makecvtitle\n"
+     ;; Set up hyperref here because it's only included in moderncv
      ;; Document's body.
      contents
      ;; Creator.
@@ -183,14 +172,15 @@ holding export options."
   "Format HEADLINE as as cventry.
 CONTENTS holds the contents of the headline.  INFO is a plist used
 as a communication channel."
-  (let* ((entry (org-cv-utils--parse-cventry headline info))
-         (note (or (org-element-property :NOTE headline) "")))
-
-    (format "\\cventry{\\textbf{%s}}{%s}{%s}{%s}{%s}{%s}\n"
+  (let ((cvstyle (org-export-data (plist-get info :cvstyle) info))
+        (entry (org-cv-utils--parse-cventry headline info))
+        (note (or (org-element-property :NOTE headline) "")))
+    (format "\\cventry{%s}{%s}{%s}{%s}{%s}{%s}\n"
             (org-cv-utils--format-time-window (alist-get 'from-date entry)
                                               (alist-get 'to-date entry))
-            (alist-get 'title entry)
-            (alist-get 'employer entry)
+            ; title is the first line in any style
+            (alist-get (if (equal cvstyle "banking") 'subtitle 'title) entry)
+            (alist-get (if (equal cvstyle "banking") 'title 'subtitle) entry)
             (alist-get 'location entry)
             note contents)))
 
@@ -200,13 +190,96 @@ as a communication channel."
 CONTENTS is the contents of the headline.  INFO is a plist used
 as a communication channel."
   (unless (org-element-property :footnote-section-p headline)
-    (let ((environment (let ((env (org-element-property :CV_ENV headline)))
+    (let ((environment (let ((env (org-element-property :CVENV headline)))
                          (or (org-string-nw-p env) "block"))))
       (cond
        ;; is a cv entry
        ((equal environment "cventry")
         (org-moderncv--format-cventry headline contents info))
        ((org-export-with-backend 'latex headline contents info))))))
+
+
+;;;###autoload
+(defun org-moderncv-export-to-latex
+    (&optional async subtreep visible-only body-only ext-plist)
+  "Export current buffer to a LaTeX file.
+
+Based on `org-latex-export-to-latex'.
+Disable hyperref package to prevent duplicate import.
+
+If narrowing is active in the current buffer, only export its
+narrowed part.
+
+If a region is active, export that region.
+
+A non-nil optional argument ASYNC means the process should happen
+asynchronously.  The resulting file should be accessible through
+the `org-export-stack' interface.
+
+When optional argument SUBTREEP is non-nil, export the sub-tree
+at point, extracting information from the headline properties
+first.
+
+When optional argument VISIBLE-ONLY is non-nil, don't export
+contents of hidden elements.
+
+When optional argument BODY-ONLY is non-nil, only write code
+between \"\\begin{document}\" and \"\\end{document}\".
+
+EXT-PLIST, when provided, is a property list with external
+parameters overriding Org default settings, but still inferior to
+file-local settings."
+  (interactive)
+  (let ((outfile (org-export-output-file-name ".tex" subtreep))
+        ; disable hyperref as moderncv already includes it
+        (org-latex-default-packages-alist
+         (seq-remove (lambda (e) (equal (nth 1 e) "hyperref"))
+                     org-latex-default-packages-alist)))
+    (org-export-to-file 'moderncv outfile
+      async subtreep visible-only body-only ext-plist)))
+
+
+;;;###autoload
+(defun org-moderncv-export-to-pdf
+    (&optional async subtreep visible-only body-only ext-plist)
+  "Export current buffer to LaTeX then process through to PDF.
+
+Based on `org-latex-export-to-pdf'.
+
+If narrowing is active in the current buffer, only export its
+narrowed part.
+
+If a region is active, export that region.
+
+A non-nil optional argument ASYNC means the process should happen
+asynchronously.  The resulting file should be accessible through
+the `org-export-stack' interface.
+
+When optional argument SUBTREEP is non-nil, export the sub-tree
+at point, extracting information from the headline properties
+first.
+
+When optional argument VISIBLE-ONLY is non-nil, don't export
+contents of hidden elements.
+
+When optional argument BODY-ONLY is non-nil, only write code
+between \"\\begin{document}\" and \"\\end{document}\".
+
+EXT-PLIST, when provided, is a property list with external
+parameters overriding Org default settings, but still inferior to
+file-local settings.
+
+Return PDF file's name."
+  (interactive)
+  (let ((outfile (org-export-output-file-name ".tex" subtreep))
+        ; disable hyperref as moderncv already includes it
+        (org-latex-default-packages-alist
+         (seq-remove (lambda (e) (equal (nth 1 e) "hyperref"))
+                     org-latex-default-packages-alist)))
+    (org-export-to-file 'moderncv outfile
+      async subtreep visible-only body-only ext-plist
+      #'org-latex-compile)))
+
 
 (provide 'ox-moderncv)
 ;;; ox-moderncv ends here

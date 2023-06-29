@@ -62,13 +62,12 @@ If both dates are the same, return just FROM-DATE"
 (defun org-cv-utils--parse-cventry (headline info)
   "Return alist describing the entry in HEADLINE.
 INFO is a plist used as a communication channel."
-  (let ((title (org-export-data (org-element-property :title headline) info)))
-    `((title . ,title)
-      (from-date . ,(or (org-element-property :FROM headline)
-                      (error "No FROM property provided for cventry %s" title)))
-      (to-date . ,(org-element-property :TO headline))
-      (employer . ,(org-element-property :EMPLOYER headline))
-      (location . ,(or (org-element-property :LOCATION headline) "")))))
+  `((from-date . ,(org-element-property :FROM headline))
+    (to-date . ,(org-element-property :TO headline))
+    (title . ,(org-export-data (org-element-property :title headline) info))
+    ; parse text to support org syntax in property
+    (subtitle . ,(org-export-string-as (or (org-element-property :SUBTITLE headline) "") 'latex t))
+    (location . ,(or (org-element-property :LOCATION headline) ""))))
 
 (provide 'org-cv-utils)
 ;;; org-cv-utils.el ends here
