@@ -1,0 +1,113 @@
+#+TITLE:  Org exporter for curriculum vitae using moderncv
+
+This project is forked from [[https://gitlab.com/Titan-C/org-cv]].
+It keeps only moderncv export and improves and fix bugs in it.
+
+* Installation
+
+To install it, you can clone this git repository and add it to your load-path:
+#+BEGIN_SRC bash
+git clone https://github.com/DCsunset/org-moderncv.git
+(use-package org-moderncv
+    :load-path "path_to_repository/org-moderncv/"
+    :init (require 'org-moderncv))
+#+END_SRC
+
+If you are using Nix, you can also import the derivation directly.
+
+* Basic Org file
+
+The basic structure of an org file containing your CV is shown next.
+** Personal contact information
+=TITLE=, =AUTHOR= and =EMAIL= are standard org options. But on =TITLE= you
+put your foreseen job.
+
+#+attr_html: :class table table-striped
+| Field    | Description                                        |
+|----------+----------------------------------------------------|
+| TITLE    | Desired job                                        |
+| AUTHOR   | Who are you?                                       |
+| EMAIL    | Your contact email                                 |
+| ADDRESS  | Mailing address, this can span over multiple lines |
+| HOMEPAGE | URL of your website                                |
+| MOBILE   | Mobile phone                                       |
+| GITHUB   | GitHub user                                        |
+| GITLAB   | GitLab user                                        |
+| LINKEDIN | Linkedin username                                  |
+| PHOTO    | path to photo file                                 |
+
+#+BEGIN_SRC org :tangle basic_cv.org
+,#+TITLE: My dream job
+,#+AUTHOR: Test
+,#+email: Test
+
+,#+ADDRESS: My Awesome crib
+,#+ADDRESS: Fantastic city -- Planet Earth
+,#+MOBILE: (+9) 87654321
+,#+HOMEPAGE: example.com
+,#+GITHUB: Test
+,#+GITLAB: Test
+,#+LINKEDIN: Test
+,#+PHOTO: smile.png
+#+END_SRC
+
+You can use org-modes hierarchical structure to describe your CV. To make a
+specific subtree an item describing an experience point (Job you have,
+degree you pursued, etc.) you use the org properties drawer and with the
+=:CV_ENV: cventry= property. You should also include the =FROM= and =TO=
+properties defining the span of the event, as =LOCATION= and =EMPLOYER=.
+#+BEGIN_SRC org :tangle workcontent.org
+,* Employement
+,** One job
+:PROPERTIES:
+:CV_ENV: cventry
+:FROM:     <2014-09-01>
+:TO:     <2017-12-07>
+:TITLE: The employer
+:SUBTITLE: a city, a country
+:END:
+
+I write about awesome stuff I do.
+,** Other job
+:PROPERTIES:
+:CV_ENV: cventry
+:FROM:     <2013-09-01>
+:TO:     <2014-08-07>
+:TITLE: The employer
+:SUBTITLE: a city, a country
+:END:
+
+I write about awesome stuff I do.
+
+,* Other stuff I do
+- I work a lot
+- I sleep a lot
+- I eat a lot
+#+END_SRC
+
+* Latex Exporter for moderncv
+
+[[https://www.ctan.org/tex-archive/macros/latex/contrib/moderncv][moderncv]] is a standard \(\LaTeX\) package that you can find in many of your
+latex distributions. I maintain a fork of it, to work with my use case at
+https://github.com/Titan-C/moderncv.git Feel free to use any or even your
+personal fork for your desired use case.
+
+To configure the export for moderncv you need the addition options in your
+org file.
+#+BEGIN_SRC org :tangle moderncv.org
+# CV theme - options include: 'casual' (default), 'classic', 'oldstyle' and 'banking'
+,#+CVSTYLE: banking
+# CV color - options include: 'blue' (default), 'orange', 'green', 'red', 'purple', 'grey' and 'black'
+,#+CVCOLOR: green
+#+END_SRC
+
+# Next block is to generate exports
+#+BEGIN_SRC org :exports none :tangle moderncv.org
+#+include: basic_cv.org
+#+include: sideactivities.org
+#+include: workcontent.org
+#+END_SRC
+
+When exporting you can use the export menu and select the CV export in LaTeX backend,
+
+
