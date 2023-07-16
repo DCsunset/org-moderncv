@@ -1,4 +1,4 @@
-;;; ox-moderncv.el --- LaTeX moderncv Back-End for Org Export Engine -*- lexical-binding: t; -*-
+;;; org-moderncv.el --- LaTeX moderncv Back-End for Org Export Engine -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2018 Free Software Foundation, Inc.
 
@@ -281,5 +281,5 @@ Return PDF file's name."
       #'org-latex-compile)))
 
 
-(provide 'ox-moderncv)
-;;; ox-moderncv ends here
+(provide 'org-moderncv)
+;;; org-moderncv ends here
