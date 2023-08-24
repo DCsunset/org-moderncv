@@ -53,6 +53,8 @@
 (org-export-define-derived-backend 'moderncv 'latex
   :options-alist
   '((:latex-class "LATEX_CLASS" nil "moderncv" t)
+    ;; can be "cv" or "letter" to make the title
+    (:cvkind "CVKIND" nil "cv" t)
     (:cvstyle "CVSTYLE" nil "classic" t)
     (:cvcolor "CVCOLOR" nil nil t)
     (:mobile "MOBILE" nil nil parse)
@@ -61,7 +63,11 @@
     (:photo "PHOTO" nil nil parse)
     (:gitlab "GITLAB" nil nil parse)
     (:github "GITHUB" nil nil parse)
-    (:linkedin "LINKEDIN" nil nil parse))
+    (:linkedin "LINKEDIN" nil nil parse)
+    ;; cover letter
+    (:recipient "RECIPIENT" nil nil newline)
+    (:opening "OPENING" nil nil parse)
+    (:closing "CLOSING" nil nil parse))
   ; append to LaTeX menu entry
   :menu-entry
   '(?l 1
@@ -126,6 +132,23 @@ holding export options."
          (format "\\address%s\n" (mapconcat (lambda (line)
                                               (format "{%s}" line))
                                             (split-string address "\n") ""))))
+
+     ;;; For cover letter
+     ;; recipient
+     (let ((recipient (org-export-data (plist-get info :recipient) info)))
+       (when (org-string-nw-p recipient)
+         (format "\\recipient%s\n" (mapconcat (lambda (line)
+                                              (format "{%s}" line))
+                                            (split-string recipient "\n") ""))))
+     ;; opening
+     (let ((opening (org-export-data (plist-get info :opening) info)))
+       (when (org-string-nw-p opening)
+         (format "\\opening{%s}\n" opening)))
+     ;; closing
+     (let ((closing (org-export-data (plist-get info :closing) info)))
+       (when (org-string-nw-p closing)
+         (format "\\closing{%s}\n" closing)))
+
      (mapconcat (lambda (social-network)
                   (let ((network (org-export-data
                                   (plist-get info (car social-network)) info)))
@@ -153,17 +176,27 @@ holding export options."
                 (if separate "" (or formatted-subtitle "")))
         (when (and separate subtitle)
           (concat formatted-subtitle "\n"))))
+
+     ;; patch makesletterclosing cmd to make spacing better
+     "\\patchcmd{\\makeletterclosing}{[3em]}{[0.5em]}{}{}\n"
+
      ;; Document start.
      "\\begin{document}\n\n"
      ;; Title command.
-     "\\makecvtitle\n"
+     (let ((cvkind (org-export-data (plist-get info :cvkind) info)))
+       (when cvkind (format "\\make%stitle\n" cvkind)))
      ;; Set up hyperref here because it's only included in moderncv
      ;; Document's body.
+     "\n\n"
      contents
+     "\n\n"
      ;; Creator.
      (and (plist-get info :with-creator)
           (concat (plist-get info :creator) "\n"))
      ;; Document end.
+     (let ((cvkind (org-export-data (plist-get info :cvkind) info)))
+       ;; increase spacing between content and closing
+       (when (equal cvkind "letter") "\\vspace*{2em}\\makeletterclosing\n"))
      "\\end{document}")))
 
 
