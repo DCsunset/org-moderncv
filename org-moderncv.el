@@ -179,6 +179,18 @@ holding export options."
 
      ;; patch makesletterclosing cmd to make spacing better
      "\\patchcmd{\\makeletterclosing}{[3em]}{[0.5em]}{}{}\n"
+     "\\makeatletter
+      \\patchcmd{\\makeletterhead}
+        {\\ifthenelse{\\isundefined{\\@extrainfo}}{}{\\makenewline\\@extrainfo}}
+        {
+          \\def\\socialsdetails{}%
+          \\collectionloop{socials}{% the key holds the social type (=symbol command prefix), the item holds the link
+            \\protected@edef\\socialsdetails{\\socialsdetails\\protect\\makenewline\\csname\\collectionloopkey socialsymbol\\endcsname\\collectionloopitem}}%
+          \\socialsdetails%
+          \\ifthenelse{\\isundefined{\\@extrainfo}}{}{\\makenewline\\@extrainfo}%
+        }
+        {}{}
+      \\makeatother\n"
 
      ;; Document start.
      "\\begin{document}\n\n"
