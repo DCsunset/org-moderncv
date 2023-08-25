@@ -13,7 +13,9 @@ git clone https://github.com/DCsunset/org-moderncv.git
     :init (require 'org-moderncv))
 #+END_SRC
 
-If you are using Nix, you can also import the derivation directly.
+If you are using Nix flake, you can add this repo to your inputs directly.
+
+This package is also available in Nix NUR: =nur.repos.dcsunset.moderncv=.
 
 * Basic Org file
 
