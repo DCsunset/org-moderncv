@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.1](https://github.com/DCsunset/org-moderncv/compare/v0.1.0...v0.1.1) (2023-09-13)
+
+
+### Features
+
+* add option to disable italic text for subtitles ([d44d401](https://github.com/DCsunset/org-moderncv/commit/d44d40140132879e4e39ad785d80f85d1d968bad))
+
+
+### Misc
+
+* add nur repo info ([d38cc6e](https://github.com/DCsunset/org-moderncv/commit/d38cc6e003ce54c3e62dc30c27b4d1f02126cbc0))
+
 ## 0.1.0 (2023-08-25)
 
 
