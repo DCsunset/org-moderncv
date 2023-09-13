@@ -26,7 +26,10 @@ put your foreseen job.
 
 | Field    | Description                                        |
 |----------+----------------------------------------------------|
-| CVKIND   | Can be _cv_ or _letter_. Default to _cv_           |
+| CVKIND   | Kind: "cv" or "letter". (default: "cv")            |
+| CVSTYLE  | Moderncv style                                     |
+| CVCOLOR  | Moderncv color                                     |
+| NOITALIC | Make subtitles non-italic in cventry if set        |
 | TITLE    | Desired job                                        |
 | AUTHOR   | Who are you?                                       |
 | EMAIL    | Your contact email                                 |
@@ -97,30 +100,4 @@ I write about awesome stuff I do.
 - I sleep a lot
 - I eat a lot
 #+END_SRC
-
-* Latex Exporter for moderncv
-
-[[https://www.ctan.org/tex-archive/macros/latex/contrib/moderncv][moderncv]] is a standard \(\LaTeX\) package that you can find in many of your
-latex distributions. I maintain a fork of it, to work with my use case at
-https://github.com/Titan-C/moderncv.git Feel free to use any or even your
-personal fork for your desired use case.
-
-To configure the export for moderncv you need the addition options in your
-org file.
-#+BEGIN_SRC org :tangle moderncv.org
-# CV theme - options include: 'casual' (default), 'classic', 'oldstyle' and 'banking'
-,#+CVSTYLE: banking
-# CV color - options include: 'blue' (default), 'orange', 'green', 'red', 'purple', 'grey' and 'black'
-,#+CVCOLOR: green
-#+END_SRC
-
-# Next block is to generate exports
-#+BEGIN_SRC org :exports none :tangle moderncv.org
-#+include: basic_cv.org
-#+include: sideactivities.org
-#+include: workcontent.org
-#+END_SRC
-
-When exporting you can use the export menu and select the CV export in LaTeX backend,
-
 

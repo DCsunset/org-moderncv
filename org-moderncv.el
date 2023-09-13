@@ -59,6 +59,8 @@
     (:cvkind "CVKIND" nil "cv" t)
     (:cvstyle "CVSTYLE" nil "classic" t)
     (:cvcolor "CVCOLOR" nil nil t)
+    ;; whether to disable italic font in all subtitles
+    (:noitalic "NOITALIC" nil nil t)
     (:mobile "MOBILE" nil nil parse)
     (:homepage "HOMEPAGE" nil nil parse)
     (:address "ADDRESS" nil nil newline)
@@ -97,12 +99,21 @@ holding export options."
      (org-latex--insert-compiler info)
      ;; Document class and packages.
      (org-latex-make-preamble info)
+     ;; Necessary packages used later
+     "\\usepackage{xpatch}\n"
      ;; cvstyle
      (let ((cvstyle (org-export-data (plist-get info :cvstyle) info)))
        (when cvstyle (format "\\moderncvstyle{%s}\n" cvstyle)))
      ;; cvcolor
      (let ((cvcolor (org-export-data (plist-get info :cvcolor) info)))
        (when (not (string-empty-p cvcolor)) (format "\\moderncvcolor{%s}\n" cvcolor)))
+     ;; disable itatic font for subtitles
+     (let ((noitalic (org-export-data (plist-get info :noitalic) info)))
+       (when (not (string-empty-p noitalic))
+         ;; itshape and slshape are used in different styles
+         ;; so remove both
+         (concat "\\xpatchcmd{\\cventry}{\\slshape}{}{}{}\n"
+                 "\\xpatchcmd{\\cventry}{\\itshape}{}{}{}\n")))
      ;; Possibly limit depth for headline numbering.
      (let ((sec-num (plist-get info :section-numbers)))
        (when (integerp sec-num)
