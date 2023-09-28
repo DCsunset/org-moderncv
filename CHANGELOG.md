@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.2.0](https://github.com/DCsunset/org-moderncv/compare/v0.1.1...v0.2.0) (2023-09-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* add general social option and remove options like github
+
+### Features
+
+* add general social option and remove options like github ([9305bc7](https://github.com/DCsunset/org-moderncv/commit/9305bc768b11e60d188b26b942de0547a6067647))
+
 ## [0.1.1](https://github.com/DCsunset/org-moderncv/compare/v0.1.0...v0.1.1) (2023-09-13)
 
 

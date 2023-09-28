@@ -1,7 +1,7 @@
 ;;; org-moderncv.el --- LaTeX moderncv Back-End for Org Export Engine -*- lexical-binding: t; -*-
 
 ;; Author: DCsunset, Oscar Najera <hi AT oscarnajera.com DOT com>
-;; Version: 0.1.1
+;; Version: 0.2.0
 ;; Keywords: org, tex
 ;; Package-Requires: ((emacs "25.1"))
 
