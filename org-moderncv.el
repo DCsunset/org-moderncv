@@ -68,6 +68,7 @@
     (:gitlab "GITLAB" nil nil parse)
     (:github "GITHUB" nil nil parse)
     (:linkedin "LINKEDIN" nil nil parse)
+    (:social "SOCIAL" nil nil newline)
     ;; cover letter
     (:recipient "RECIPIENT" nil nil newline)
     (:opening "OPENING" nil nil parse)
@@ -172,6 +173,21 @@ holding export options."
                   (:gitlab "gitlab")
                   (:linkedin "linkedin"))
                 "")
+
+     ;; each social line is in format: kind | content [| url]
+     (let ((social (org-export-data (plist-get info :social) info)))
+       (when (org-string-nw-p social)
+         (mapconcat (lambda (line)
+                      (let* ((items (mapcar #'string-trim (split-string line "|")))
+                             (nargs (length items)))
+                        (when (or (> nargs 3)
+                                  (< nargs 2))
+                          (error "Invalid number of args in social"))
+                        (let ((kind (nth 0 items))
+                              (content (nth 1 items))
+                              (url (or (nth 2 items) "")))
+                          (format "\\social[%s][%s]{%s}\n" kind url content))))
+                    (split-string social "\n") "")))
 
      ;; Date.
      (let ((date (and (plist-get info :with-date) (org-export-get-date info))))

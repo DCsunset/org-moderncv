@@ -36,11 +36,13 @@ put your foreseen job.
 | ADDRESS  | Mailing address, this can span over multiple lines |
 | HOMEPAGE | URL of your website                                |
 | MOBILE   | Mobile phone                                       |
-| GITHUB   | GitHub user                                        |
-| GITLAB   | GitLab user                                        |
-| LINKEDIN | Linkedin username                                  |
+| SOCIAL   | Social items                                       |
 | PHOTO    | path to photo file                                 |
 
+
+The social items correspond to the ~\social~ command in moderncv.
+Each item consists of =kind=, =content=, and an optional =url=, separated by =|=.
+(e.g. =github | <user>| https://github.com/<user>= or just =gitlab | <user>=).
 
 There are some options that only apply to the cover letter, as listed below.
 You don't need to set them if you are not using the cover letter.
@@ -62,8 +64,8 @@ You don't need to set them if you are not using the cover letter.
 ,#+MOBILE: (+9) 87654321
 ,#+HOMEPAGE: example.com
 ,#+GITHUB: Test
-,#+GITLAB: Test
-,#+LINKEDIN: Test
+,#+SOCIAL: github | <user>
+,#+SOCIAL: linkedin | <name> | <url>
 ,#+PHOTO: smile.png
 #+END_SRC
 
